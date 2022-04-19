@@ -59,7 +59,7 @@ services:
             - NIFI_ZK_CONNECT_STRING=myzookeeper:2181
             - NIFI_ELECTION_MAX_WAIT=30 sec
             - NIFI_SENSITIVE_PROPS_KEY='12345678901234567890A'
-            - NIFI_CLUSTER_PROTOCOL_HEARTBEAT_INTERVAL=60 secs
+            - NIFI_CLUSTER_PROTOCOL_HEARTBEAT_INTERVAL=60 sec
         restart: on-failure
         healthcheck:
             test: ["CMD", "curl", "-f", "http://mynifi:8080/nifi/"]

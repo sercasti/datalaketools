@@ -56,7 +56,7 @@ Access NiFi registry in your browser: <http://localhost:18080/nifi-registry>
 Access NiFi via (<http://localhost:8091/nifi/>)
 
   1. Drag and drop a "Process group" (4th icon) to the blank space.
-  1. Right click the process group and click "Configure" 
+  1. Right click the process group and click "Configure"
   1. In the tab "Controller services" add a new controller by clicking the plus-symbol on the right-hand side. Choose DBCPConnectionPool from the long list of available controllers and click Add.
 
 Edit the newly created controller’s properties (using the gear icon) as follows:
@@ -76,12 +76,56 @@ Access the service in your browser under <http://localhost:9001/dashboard>. The 
   1. Click on Buckets in the navigation bar on the left and click Create Bucket in the top right corner.
   1. Choose a name for your bucket, e.g. miniobucket, keep the default configurations and click on Save
   1. Select your bucket and click on Browse.
-  1. Create a new directory called "test" and within it click the Upload file-symbol to upload minio_testfile.txt 
+  1. Create a new directory called "test" and within it click the Upload file-symbol to upload minio_testfile.txt
   
-In the next step we will configure NiFi to retrieve this file from MinIO!
-
 ### Part 6: Apache Airflow to the postgres database
+
+Open the Airflow service in your browser at <http://localhost:8085/admin/> and click on Admin -> Connections in the top bar. Airflow comes with a lot of connections by default, but let's create a new one for our purpose.
+
+Click on Create and fill in the necessary details:
+
+- Conn Id: mypostgres_connection - the ID with which we can retrieve the connection details later on.
+- Conn Type: Postgres - Select it from the dropdown menu.
+- Host: mypostgres - Docker will resolve the hostname.
+- Schema: postgres - the database name (the label is misleading)
+- Login: postgres - or whichever username you set in your docker-compose.yml file.
+- Password: postgres - or whichever password you set in your docker-compose.yml file.
+- Port: 5432 - the standard port for the database within the docker network.
+
+Then click on "save"
+
+1. Return to the Airflow home, find the "hello_postgres_postgres_operator" DAG and activate it on the left toogle, then click on "Trigger DAG" on the right-hand side.
 
 ### Part 7: Apache Airflow to Apache NiFi
 
+Within the Airflow service in your browser at <http://localhost:8085/admin/> let’s create a connection for our NiFi service as follows:
+
+- Conn ID: mynifi_connection
+- Conn Type: Postgres (Since there is no NiFi connection type, thus we use postgres as a stand-in.)
+- Host: <http://mynifi>
+- Port: 8080 (This is the port inside the network, not the one we mapped externally!)
+
 ### Part 8: Apache Airflow to MinIO
+
+Within the Airflow service in your browser at <http://localhost:8085/admin/> set up a new connection under the Admin -> Connections GUI:
+
+- Conn ID: myminio_connection
+- Conn Type: S3 Since there is no NiFi connection type, thus we use postgres as a stand-in.
+Extra: consists of the JSON below:
+
+```
+{
+  "aws_access_key_id":"minio_admin",
+  "aws_secret_access_key": "minio_password",
+  "host": "http://myminio:9000"
+}
+```
+
+### Review
+
+we learned:
+
+- how to configure our services,
+- how to connect our services with one another,
+- how to make use of the overall infrastructure and
+- how the services can interact and communicate with one another.

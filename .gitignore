@@ -1,0 +1,7 @@
+.DS_Store
+nifi/logs/
+minio/data/
+.vscode/
+airflow/logs/
+airflow/dags/__pycache__
+nifi_registry/database/
