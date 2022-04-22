@@ -5,3 +5,4 @@ minio/data/
 airflow/logs/
 airflow/dags/__pycache__
 nifi_registry/database/
+workspace.code-workspace

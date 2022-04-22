@@ -1,6 +1,8 @@
 # Build a Data Lake App tutorial
 
-## We are using the following tech-stack
+## Tools setup
+
+We are using the following tech-stack:
 
 - Apache NiFi to process and distribute data.
 - Apache NiFi Registry to store, manage and version control NiFi resources.
@@ -9,7 +11,7 @@
 - pgAdmin as the administration and development platform for the postgres database.
 - MinIO as a locally hosted, S3-compatible object-storage.
 
-![diagram](diagram.png "Diagram")
+![images/diagram](images/diagram.png "Diagram")
 
 Apache NiFi supports powerful and scalable directed graphs of data routing, transformation, and system mediation logic.
 
@@ -25,7 +27,7 @@ pgAdmin is an open source database administration and development platform for t
 MinIO as a locally hosted stand-in for AWS S3 as an object-storage.
 MinIO offers high-performance, S3 compatible object storage.
 
-### Part 1: setup
+### Part 1: Pre-requisites
 
 1. Install docker: <https://www.docker.com/products/docker-desktop>
 1. git clone <https://github.com/sercasti/eureka-client.git> (or download <https://github.com/sercasti/eureka-client/archive/refs/heads/master.zip>)
@@ -129,3 +131,111 @@ we learned:
 - how to connect our services with one another,
 - how to make use of the overall infrastructure and
 - how the services can interact and communicate with one another.
+
+## Let's build an ETL pipeline with Airflow and NiFi
+
+1. We will create a table and import some data to process on a PostgreSQL table
+1. A scheduled Airflow DAG executes a preparatory task
+1. Airflow triggers a processor in Apache NiFi
+1. NiFi executes an ETL process, which reads the database table, and stores the result on S3 (MinIO)
+1. Airflow waits for NiFi to finish,
+1. Airflow continues with some other task.
+
+### Postgre Initial Data
+
+1. Open pgAdmin at: <http://localhost:5050/> with the master password you created earlier
+1. Navigate the tree panel on the left, open your postgres_db server, open the databases entry, and click on the "postgres" database
+Using the Query tool (inside the tools menu), copy paste the contents of the [postgres/create_table.sql](postgres/create_table.sql) to create the initial table, and press "Execute" (the play button)
+1. Check your newly created table inside the "tables" node on the left panel, right click on the table name and choose "Import/Export"
+1. Toogle the popup to "Import"
+1. For the filename input, click on the "..." and choose the "pp-monthly.csv" file
+1. Header, choose "Yes" and press OK. This should import 126641 rows to the "land_registry_price_paid_uk"
+
+Source: <https://www.postgresql.org/message-id/attachment/92675/land-registry-data.txt>
+
+Now that we have some transactional data to ETL, let's build our pipeline
+
+### Thoughts
+
+While NiFi does have the option to schedule processors with CRON strings, it is usually a bad idea to schedule jobs within NiFi itself — unless you don’t have another choice. Using Airflow we can monitor and schedule all of our tasks, wherever they may be, in one single place with a simple and good-looking interface, access to logs and highly customizable scheduling pipelines which can interact with, in-/exclude or depend on each other.
+
+Similarly, while Airflow can also also execute ETL-tasks (for example coded in Python) that should ideally be implemented in NiFi, you really shouldn’t use Airflow to do so. On the one hand Airflow is built to be a monitoring and scheduling software, on the other hand, we would loose all of NiFi’s inherent advantages concerning data extraction, transformation and loads.
+
+Using Airflow solely as scheduler and letting NiFi do the heavy lifting in our backend, we get the best of both worlds: Airflow’s ability to author, schedule and monitor workflows with NiFi’s scalable, powerful and highly configurable directed graphs to route and transform data.
+
+### NiFi configuration
+
+We need three processors:
+
+- A QueryDatabaseTable processor to act as a starting node of our pipeline which can be triggered from Airflow. This will return the rows from the PostgreSQL table we created above, in Avro format.
+- A ConvertAvroToParquet processor to transform the rows to parquet
+- A PutS3Object process to write those records to S3 (MinIO)
+- An UpdateAttribute processor to act as the end node of our pipeline whose state can be queried by Airflow.
+
+Let's build our first NiFi pipeline, using these processors:
+
+![images/nifipipeline.png](images/nifipipeline.png "Pipeline")
+
+#### Create the Start Node
+
+Head over to <http://localhost:8091/nifi/>, then double click the process group we originally created at (#part-4-apache-nifi-to-the-postgres-database), you can create a new proces group, but double check that "Controller Services" (inside the process group configuration) has the "DBCConnectionPool" service listed and enabled.
+![images/ControllerServices.png](images/ControllerServices.png "Pipeline")
+
+1. Drag the first icon to the NiFi board, thus creating a new Processor
+1. Choose the "QueryDatabaseTable" type and click "add"
+1. Double click on the Node you just created, switch to the "Scheduling" tab in that processor config, set execution to "Primary Node" and Run Schedule to "60 sec"
+
+![images/scheduling.png](images/scheduling.png "Processor")
+
+1. Switch to the "Properties" tab in that processor config, and set these properties:
+
+- Database connection pooling: DBCPConnectionPool
+- Database Type: PostgreSQL
+- Table name: land_registry_price_paid_uk
+
+![images/QueryDatabaseTable.png](images/QueryDatabaseTable.png "QueryDatabaseTable")
+
+#### Create the convert processor
+
+1. Drag the first icon to the NiFi board, thus creating a second new Processor
+1. Choose the "ConvertAvroToParquet" type and click "add"
+
+#### Create the PutS3Object node
+
+1. Create a PutS3 processor with this configuration:
+
+- Bucket: miniobucket
+- Credentials File: /opt/nifi/nifi-current/credentials/credentials.properties (the path as specified inside the container)
+- **Endpoint Override URL**: <http://myminio:9000> (overriding the endpoint for AWS S3 with the one of our private MinIO instance)
+
+![images/PutS3ObjectConfig.png](images/PutS3ObjectConfig.png "PutS3ObjectConfig")
+
+#### Create the EndNode
+
+1. Drag the first icon to the NiFi board, thus creating a new Processor
+1. Choose the "UpdateAttribute" type and click "add"
+1. Double click on the Node you just created, and change the name to "EndNode"
+1. Switch to the "Properties" tab in that processor config, set Store state to "Store state locally"
+
+Now we have everything we need in NiFi — a startnode processor, an endnode processor and whatever we may want to pack in between the two: data extraction, transformation and/or load tasks.
+
+Go ahead, and dragging the arrows on each processor, link them to look like this:
+![images/nifipipeline.png](images/nifipipeline.png "Pipeline")
+
+Then choose them all (Ctrl-A o command-a) and click "Start" (the play) button. This will query the database, convert the avro resultset to parquet, and save the result to MinIo
+
+![images/minioresult.png](images/minioresult.png "minioresult")
+
+#### Orchestrate the pipeline from Airflow
+
+Click on the QueryDatabaseTable processor we created earlier, and copy the processor id.
+![images/processorId.png](images/processorId.png "processorId")
+
+We will trigger that processor from Airflow now. Open the file "airflow/dags/hello_nifi.py" on the code you cloned from git, and in line 17, replace the dummy processor id with the value you just copied in the previous step.
+
+1. Open the Airflow console at <http://localhost:8085/admin/> and find the "hello_nifi" dag. Make sure it is toggled "On",
+1. Open the DAG and go to the "Code" tab, make sure your id has been replaced.
+1. Use the "trigger DAG" button to start the cycle.
+
+You'll see the Airflow DAG triggering the nifi flow:
+![images/triggerDAG.png](images/triggerDAG.png "triggerDAG")
