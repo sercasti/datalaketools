@@ -30,7 +30,7 @@ MinIO offers high-performance, S3 compatible object storage.
 ### Part 1: Pre-requisites
 
 1. Install docker: <https://www.docker.com/products/docker-desktop>
-1. git clone <https://github.com/sercasti/eureka-client.git> (or download <https://github.com/sercasti/eureka-client/archive/refs/heads/master.zip>)
+1. git clone <https://github.com/sercasti/datalaketools.git>
 1. Inside the folder, execute: docker-compose up
 
 ### Part 2: Connect pgAdmin to the postgres database
