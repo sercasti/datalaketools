@@ -69,7 +69,7 @@ Edit the newly created controller’s properties (using the gear icon) as follow
 - Database User: postgres (or whatever you changed it to during setup)
 - Password: postgres (or whatever you changed it to during setup)
 
-Click Apply, close the configuration popup, and enable the service by selecting the lightning-symbol of the line depicting the newly created controller and choosing Enable in the window which opens.
+Click Apply, and enable the service by selecting the lightning-symbol of the line depicting the newly created controller and choosing Enable in the window which opens.
 
 ### Part 5: Apache NiFi to MinIO
 
@@ -78,7 +78,7 @@ Access the service in your browser under <http://localhost:9001/dashboard>. The 
   1. Click on Buckets in the navigation bar on the left and click Create Bucket in the top right corner.
   1. Choose a name for your bucket, e.g. miniobucket, keep the default configurations and click on Save
   1. Select your bucket and click on Browse.
-  1. Create a new directory called "test" and within it click the Upload file-symbol to upload minio_testfile.txt
+  1. Create a new directory using the "Create new path" button, call it "test" and within it click the Upload file-symbol to upload minio_testfile.txt that you can find in the root of the cloned directory "datalaketools".
   
 ### Part 6: Apache Airflow to the postgres database
 
@@ -96,11 +96,11 @@ Click on Create and fill in the necessary details:
 
 Then click on "save"
 
-1. Return to the Airflow home, find the "hello_postgres_postgres_operator" DAG and activate it on the left toogle, then click on "Trigger DAG" on the right-hand side.
+1. Return to the Airflow home, find the "hello_postgres_postgres_operator" DAG and activate it on the left toogle, then click on "Trigger DAG" on the right-hand side (first icon).
 
 ### Part 7: Apache Airflow to Apache NiFi
 
-Within the Airflow service in your browser at <http://localhost:8085/admin/> let’s create a connection for our NiFi service as follows:
+Within the Airflow service in your browser at <http://localhost:8085/admin/> let’s create a connection for our NiFi service as follows. Click on Admin -> Connections in the top bar. Click "Create"
 
 - Conn ID: mynifi_connection
 - Conn Type: Postgres (Since there is no NiFi connection type, thus we use postgres as a stand-in.)
@@ -146,7 +146,7 @@ we learned:
 1. Open pgAdmin at: <http://localhost:5050/> with the master password you created earlier
 1. Navigate the tree panel on the left, open your postgres_db server, open the databases entry, and click on the "postgres" database
 Using the Query tool (inside the tools menu), copy paste the contents of the [postgres/create_table.sql](postgres/create_table.sql) to create the initial table, and press "Execute" (the play button)
-1. Check your newly created table inside the "tables" node on the left panel, right click on the table name and choose "Import/Export"
+1. Check your newly created table inside the "Schemas -> public -> Tables" node on the left panel, right click on the table "land_registry_price_paid_uk" and choose "Import/Export"
 1. Toogle the popup to "Import"
 1. For the filename input, click on the "..." and choose the "pp-monthly.csv" file
 1. Header, choose "Yes" and press OK. This should import 126641 rows to the "land_registry_price_paid_uk"
