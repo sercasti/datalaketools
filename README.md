@@ -224,7 +224,12 @@ Go ahead, and dragging the arrows on each processor, link them to look like this
 
 When you connect the links, you need to choose "For Relationship: success"
 
-Then choose them all (Ctrl-A o command-a) and click "Start" (the play) button on the left of your screen. This will query the database, convert the avro resultset to parquet, and save the result to MinIo
+Fix any processors with an orange warning icon:
+![images/warning.png](images/warning.png "Warning"). The warning will tell you what's missing, for example, for "Relationship failure is not connected to any component", just set it to auto-terminate:
+
+![images/relationship.png](images/relationship.png "Relationship")
+
+Once all warnings are fixed, choose them all (Ctrl-A o command-a) and click "Start" (the play) button on the left of your screen. This will query the database, convert the avro resultset to parquet, and save the result to MinIo
 
 ![images/minioresult.png](images/minioresult.png "minioresult")
 
