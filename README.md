@@ -202,7 +202,7 @@ Head over to <http://localhost:8091/nifi/>, then double click the process group 
 
 #### Create the PutS3Object node
 
-1. Create a PutS3 processor with this configuration:
+1. Create a PutS3 processor with this configuration on the properties tab:
 
 - Bucket: miniobucket
 - Credentials File: /opt/nifi/nifi-current/credentials/credentials.properties (the path as specified inside the container)
@@ -222,7 +222,9 @@ Now we have everything we need in NiFi — a startnode processor, an endnode pro
 Go ahead, and dragging the arrows on each processor, link them to look like this:
 ![images/nifipipeline.png](images/nifipipeline.png "Pipeline")
 
-Then choose them all (Ctrl-A o command-a) and click "Start" (the play) button. This will query the database, convert the avro resultset to parquet, and save the result to MinIo
+When you connect the links, you need to choose "For Relationship: success"
+
+Then choose them all (Ctrl-A o command-a) and click "Start" (the play) button on the left of your screen. This will query the database, convert the avro resultset to parquet, and save the result to MinIo
 
 ![images/minioresult.png](images/minioresult.png "minioresult")
 
