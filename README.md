@@ -48,7 +48,7 @@ Access NiFi registry in your browser: <http://localhost:18080/nifi-registry>
 
   1. Click on the wrench-symbol in the top right corner of the window.
   1. Click on “NEW BUCKET” on the right side.
-  1. Enter a name for you bucket, for instance myfirstbucket.
+  1. Enter a name for you bucket, for instance "myfirstbucket" then use the "Create" button.
   1. Head over to <http://localhost:8091/nifi/> and click on the three bars in the top right corner to access "Controller settings".
   1. Then click on the tab "Registry clients" and on the plus-symbol on the right-hand side.
   1. Put any name you like (i.e. "nify-registry") and URL <http://myregistry:18080>
@@ -57,7 +57,7 @@ Access NiFi registry in your browser: <http://localhost:18080/nifi-registry>
 
 Access NiFi via (<http://localhost:8091/nifi/>)
 
-  1. Drag and drop a "Process group" (4th icon) to the blank space.
+  1. Drag and drop a "Process group" (4th icon) to the blank space. Set a name and click "add"
   1. Right click the process group and click "Configure"
   1. In the tab "Controller services" add a new controller by clicking the plus-symbol on the right-hand side. Choose DBCPConnectionPool from the long list of available controllers and click Add.
 
@@ -65,11 +65,11 @@ Edit the newly created controller’s properties (using the gear icon) as follow
 
 - Database Connection URL: jdbc:postgresql://mypostgres:5432/postgres
 - Database Driver Class Name: org.postgresql.Driver
-- Database Driver Location(s): /opt/nifi/nifi-current/jdbc/postgresql-42.3.1.jar
+- Database Driver Location(s): /opt/nifi/nifi-current/jdbc/postgresql-42.3.3.jar
 - Database User: postgres (or whatever you changed it to during setup)
 - Password: postgres (or whatever you changed it to during setup)
 
-Click Apply and enable the service by selecting the lightning-symbol of the line depicting the newly created controller and choosing Enable in the window which opens.
+Click Apply, close the configuration popup, and enable the service by selecting the lightning-symbol of the line depicting the newly created controller and choosing Enable in the window which opens.
 
 ### Part 5: Apache NiFi to MinIO
 
