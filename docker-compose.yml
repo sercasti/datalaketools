@@ -107,11 +107,7 @@ services:
         networks:
             - dataworld
         restart: on-failure
-        healthcheck:
-            test: ["CMD", "pg_isready -U postgres"]
-            interval: 30s
-            timeout: 20s
-            retries: 3
+        
     # database administration tool
     pgadmin:
         hostname: mypgadmin
@@ -129,12 +125,7 @@ services:
         networks:
             - dataworld
         restart: on-failure
-        healthcheck:
-            test: ["CMD", "curl", "-f", "http://mypgadmin:80/misc/ping"]
-            interval: 30s
-            timeout: 20s
-            retries: 3
-
+        
     # object storage
     minio:
         hostname: myminio
@@ -167,7 +158,7 @@ services:
             - /var/run/docker.sock:/var/run/docker.sock:ro
             - ./portainer-data:/data
         ports:
-            - 9000:9009
+            - 9009:9000
 
 volumes:
     airflow-data:
