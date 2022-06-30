@@ -29,9 +29,13 @@ MinIO offers high-performance, S3 compatible object storage.
 
 ### Part 1: Pre-requisites
 
-1. Install docker: <https://www.docker.com/products/docker-desktop>
+1. Install docker: <https://www.docker.com/products/docker-desktop> (**If using windows, Disable WSL during the install, we will use HyperV**)
+
+![images/disablewsl.png](images/disablewsl.png "disablewsl")
 1. git clone <https://github.com/sercasti/datalaketools.git>
-1. Inside the folder, execute: docker-compose up
+1. (If using Windows) Enable file sharing on the Docker desktop app over the folder wher you cloned this repository
+![images/settingsDocker.png](images/settingsDocker.png "settingsDocker")
+1. Using your command line console (cmd o terminal), get inside the datalaketools folder, and execute: docker-compose up
 
 ### Part 2: Connect pgAdmin to the postgres database
 
