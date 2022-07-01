@@ -17,7 +17,7 @@ services:
             - ./airflow/requirements/requirements.txt:/requirements.txt
             - ./airflow/airflow.cfg:/usr/local/airflow/airflow.cfg
         environment:
-            - GUNICORN_CMD_ARGS="--log-level WARNING"
+            - GUNICORN_CMD_ARGS=--log-level warning
         restart: on-failure
         healthcheck:
             test: ["CMD", "curl", "-f", "http://myairflow:8080/admin/"]
@@ -80,7 +80,7 @@ services:
         ports:
             - "18080:18080"
         environment:
-            - LOG_LEVEL=INFO
+            - LOG_LEVEL=ERROR
             - NIFI_REGISTRY_DB_DIR=/opt/nifi-registry/nifi-registry-current/database
             - NIFI_REGISTRY_FLOW_PROVIDER=file
             - NIFI_REGISTRY_FLOW_STORAGE_DIR=/opt/nifi-registry/nifi-registry-current/flow_storage
