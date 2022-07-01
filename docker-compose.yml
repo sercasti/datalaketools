@@ -46,13 +46,6 @@ services:
         networks:
             - dataworld
         volumes:
-            - nifi-database_repository:/opt/nifi/nifi-current/database_repository
-            - nifi-flowfile_repository:/opt/nifi/nifi-current/flowfile_repository
-            - nifi-content_repository:/opt/nifi/nifi-current/content_repository
-            - nifi-provenance_repository:/opt/nifi/nifi-current/provenance_repository
-            - nifi-conf:/opt/nifi/nifi-current/conf
-            - nifi-state:/opt/nifi/nifi-current/state
-            - ./nifi/logs:/opt/nifi/nifi-current/logs
             - ./nifi/jdbc:/opt/nifi/nifi-current/jdbc
             - ./nifi/credentials:/opt/nifi/nifi-current/credentials
             - ./nifi/logback.xml:/opt/nifi/nifi-current/conf/logback.xml
@@ -160,20 +153,15 @@ services:
         volumes:
             - /etc/localtime:/etc/localtime:ro
             - /var/run/docker.sock:/var/run/docker.sock:ro
-            - ./portainer-data:/data
+            - portainer-data:/data
         ports:
             - 9009:9000
 
 volumes:
     airflow-data:
-    nifi-database_repository:
-    nifi-flowfile_repository:
-    nifi-content_repository:
-    nifi-provenance_repository:
-    nifi-state:
-    nifi-conf:
     postgres:
     pgadmin:
+    portainer-data:
 
 networks:
     dataworld:
